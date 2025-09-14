@@ -18,16 +18,16 @@ import java.util.function.Function;
 @Slf4j
 public class JwtUtils {
 
-    private static final long EXPIRATION_TIME_IN_MILLISEC = 1000L * 60L * 60L * 24L * 30L * 6L; //expires in 6 months in milliseconds
+    private static final long EXPIRATION_TIME_IN_MILLISEC = 1000L * 60L * 60L * 24L * 30L * 6L; //expires in 6 months in milleces
     private SecretKey key;
 
-    @Value("${jwt.secret}")
-    private String jwtSecret;
+    @Value("${secreteJwtString}")
+    private String secreteJwtString;
 
 
     @PostConstruct
     private void init() {
-        byte[] keyByte = jwtSecret.getBytes(StandardCharsets.UTF_8);
+        byte[] keyByte = secreteJwtString.getBytes(StandardCharsets.UTF_8);
         this.key = new SecretKeySpec(keyByte, "HmacSHA256");
     }
 
@@ -48,12 +48,14 @@ public class JwtUtils {
         return claimsTFunction.apply(Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload());
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails) {
+    public boolean isTokeValid(String token, UserDetails userDetails) {
         final String username = getUsernameFromToken(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        return (username.equals(userDetails.getUsername()) && !isTokeExpired(token));
     }
 
-    private boolean isTokenExpired(String token) {
+    private boolean isTokeExpired(String token) {
         return extractClaims(token, Claims::getExpiration).before(new Date());
     }
+
+
 }
